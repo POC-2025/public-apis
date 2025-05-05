@@ -170,3 +170,29 @@ class TestValidateLinks(unittest.TestCase):
         self.assertFalse(result1)
         self.assertFalse(result2)
         self.assertFalse(result3)
+
+    def test_find_link_in_text_with_malicious_input(self):
+        malicious_text = """
+            # this is valid
+
+            http://example.com?param1=1&param2=2#anchor
+            https://www.example.com?param1=1&param2=2#anchor
+            https://www.example.com.br
+            https://www.example.com.gov.br
+            [Example](https://www.example.com?param1=1&param2=2#anchor)
+            lorem ipsum https://www.example.com?param1=1&param2=2#anchor
+            https://www.example.com?param1=1&param2=2#anchor lorem ipsum
+
+            # this not is valid
+
+            example.com
+            https:example.com
+            https:/example.com
+            https//example.com
+            https//.com
+        """
+
+        malicious_text += "<script>alert('XSS')</script>"
+
+        with self.assertRaises(ValueError):
+            find_links_in_text(malicious_text)
