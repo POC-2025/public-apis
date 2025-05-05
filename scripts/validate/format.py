@@ -6,7 +6,6 @@ from string import punctuation
 from typing import List, Tuple, Dict
 
 # Temporary replacement
-# The descriptions that contain () at the end must adapt to the new policy later
 punctuation = punctuation.replace('()', '')
 
 anchor = '###'
@@ -33,11 +32,9 @@ APIList = List[str]
 Categories = Dict[str, APIList]
 CategoriesLineNumber = Dict[str, int]
 
-
 def error_message(line_number: int, message: str) -> str:
     line = line_number + 1
     return f'(L{line:03d}) {message}'
-
 
 def get_categories_content(contents: List[str]) -> Tuple[Categories, CategoriesLineNumber]:
 
@@ -66,7 +63,6 @@ def get_categories_content(contents: List[str]) -> Tuple[Categories, CategoriesL
 
     return (categories, category_line_num)
 
-
 def check_alphabetical_order(lines: List[str]) -> List[str]:
 
     err_msgs = []
@@ -83,26 +79,22 @@ def check_alphabetical_order(lines: List[str]) -> List[str]:
     
     return err_msgs
 
-
 def check_title(line_num: int, raw_title: str) -> List[str]:
 
     err_msgs = []
 
     title_match = link_re.match(raw_title)
 
-    # url should be wrapped in "[TITLE](LINK)" Markdown syntax
     if not title_match:
         err_msg = error_message(line_num, 'Title syntax should be "[TITLE](LINK)"')
         err_msgs.append(err_msg)
     else:
-        # do not allow "... API" in the entry title
         title = title_match.group(1)
         if title.upper().endswith(' API'):
             err_msg = error_message(line_num, 'Title should not end with "... API". Every entry is an API here!')
             err_msgs.append(err_msg)
 
     return err_msgs
-
 
 def check_description(line_num: int, description: str) -> List[str]:
 
@@ -125,7 +117,6 @@ def check_description(line_num: int, description: str) -> List[str]:
     
     return err_msgs
 
-
 def check_auth(line_num: int, auth: str) -> List[str]:
 
     err_msgs = []
@@ -141,7 +132,6 @@ def check_auth(line_num: int, auth: str) -> List[str]:
     
     return err_msgs
 
-
 def check_https(line_num: int, https: str) -> List[str]:
 
     err_msgs = []
@@ -152,7 +142,6 @@ def check_https(line_num: int, https: str) -> List[str]:
 
     return err_msgs
 
-
 def check_cors(line_num: int, cors: str) -> List[str]:
 
     err_msgs = []
@@ -162,7 +151,6 @@ def check_cors(line_num: int, cors: str) -> List[str]:
         err_msgs.append(err_msg)
     
     return err_msgs
-
 
 def check_entry(line_num: int, segments: List[str]) -> List[str]:
 
@@ -188,7 +176,6 @@ def check_entry(line_num: int, segments: List[str]) -> List[str]:
 
     return err_msgs
 
-
 def check_file_format(lines: List[str]) -> List[str]:
 
     err_msgs = []
@@ -207,7 +194,6 @@ def check_file_format(lines: List[str]) -> List[str]:
         if category_title_match:
             category_title_in_index.append(category_title_match.group(1))
 
-        # check each category for the minimum number of entries
         if line_content.startswith(anchor):
             category_match = anchor_re.match(line_content)
             if category_match:
@@ -227,7 +213,6 @@ def check_file_format(lines: List[str]) -> List[str]:
             num_in_category = 0
             continue
 
-        # skips lines that we do not care about
         if not line_content.startswith('|') or line_content.startswith('|---'):
             continue
 
@@ -239,7 +224,6 @@ def check_file_format(lines: List[str]) -> List[str]:
             continue
     
         for segment in segments:
-            # every line segment should start and end with exactly 1 space
             if len(segment) - len(segment.lstrip()) != 1 or len(segment) - len(segment.rstrip()) != 1:
                 err_msg = error_message(line_num, 'each segment must start and end with exactly 1 space')
                 err_msgs.append(err_msg)
@@ -249,7 +233,6 @@ def check_file_format(lines: List[str]) -> List[str]:
         err_msgs.extend(entry_err_msgs)
     
     return err_msgs
-
 
 def main(filename: str) -> None:
 
@@ -262,7 +245,6 @@ def main(filename: str) -> None:
         for err_msg in file_format_err_msgs:
             print(err_msg)
         sys.exit(1)
-
 
 if __name__ == '__main__':
 
