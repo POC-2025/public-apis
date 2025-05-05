@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import os
 
 from validate.links import find_links_in_text
 from validate.links import check_duplicate_links
@@ -170,3 +171,16 @@ class TestValidateLinks(unittest.TestCase):
         self.assertFalse(result1)
         self.assertFalse(result2)
         self.assertFalse(result3)
+
+    def test_get_host_from_link_with_malicious_input(self):
+        malicious_links = [
+            None,
+            12345,
+            True,
+            b'https://example.com',
+            os.path.abspath(__file__),
+        ]
+
+        for link in malicious_links:
+            with self.assertRaises(TypeError):
+                get_host_from_link(link)
